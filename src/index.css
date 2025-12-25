@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1. IMPORT FONTS (Cairo for Arabic) */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+@layer base {
+  body {
+    @apply font-sans bg-slate-900 text-slate-100 antialiased;
+    font-family: 'Cairo', sans-serif; /* Set Cairo as default */
+  }
+}
+
+/* =========================================
+   2. ACCESSIBILITY STYLES (REQUIRED)
+   These work with the "AccessibilityContext"
+   ========================================= */
+
+/* HIGH CONTRAST MODE */
+/* When the class .high-contrast is added to body, we override EVERYTHING */
+body.high-contrast {
+  background-color: #000000 !important;
+  color: #FFFF00 !important; /* Bright Yellow for visibility */
+}
+
+/* Force all elements to follow the scheme */
+body.high-contrast * {
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+  border-color: #FFFF00 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  background-image: none !important; /* Remove gradients */
+}
+
+/* Make images high contrast */
+body.high-contrast img,
+body.high-contrast svg {
+  filter: grayscale(100%) contrast(150%) !important;
+  background-color: transparent !important;
+}
+
+/* Ensure buttons and inputs have visible borders */
+body.high-contrast button,
+body.high-contrast input, 
+body.high-contrast a {
+  border: 2px solid #FFFF00 !important;
+  text-decoration: underline !important;
+}
+
+/* =========================================
+   3. ANIMATIONS (For the Widget)
+   ========================================= */
+
+/* Slide Up Animation for the Accessibility Panel */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+/* Slow Spin for the Settings Icon */
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   4. UTILITIES
+   ========================================= */
+
+/* Custom Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Nice Scrollbar for the rest of the site */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a; 
+}
+::-webkit-scrollbar-thumb {
+  background: #334155; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
+}
+
+/* Text Selection Color (Matches your Blue theme) */
+::selection {
+  background-color: #3b82f6; /* Blue-500 */
+  color: white;
+}
