@@ -12,8 +12,9 @@ import {
   Maximize2,
   Mic,       
   MicOff,
-  Volume2,   // Added: For reading text
-  Square     // Added: For stopping text
+  Volume2,   
+  Square,
+  Send // Added: Icon for the publish button
 } from 'lucide-react';
 
 const ContentWorkspace = () => {
@@ -21,13 +22,20 @@ const ContentWorkspace = () => {
   const [inputText, setInputText] = useState('');
   
   // --- STATE: Generated Content & TTS ---
-  const [generatedContent, setGeneratedContent] = useState(''); // Holds the result text
+  const [generatedContent, setGeneratedContent] = useState(''); 
   const [isSpeaking, setIsSpeaking] = useState(false);
   // --------------------------------------
 
   // --- ADDED: Microphone Logic (Existing) ---
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+
+  // --- NEW: Publish Logic ---
+  const handlePublish = () => {
+    if (!generatedContent) return alert("الرجاء توليد محتوى أولاً قبل النشر");
+    alert("جاري تحضير المقال للنشر...");
+    console.log("Publishing:", generatedContent);
+  };
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -57,7 +65,6 @@ const ContentWorkspace = () => {
       setRecognition(rec);
     }
 
-    // Cleanup speech synthesis on unmount
     return () => {
       window.speechSynthesis.cancel();
     };
@@ -74,19 +81,16 @@ const ContentWorkspace = () => {
     }
   };
 
-  // --- NEW: Handle Text-to-Speech (Read Article) ---
   const handleSpeak = () => {
     if (!generatedContent) return;
 
     if (isSpeaking) {
-      // Stop speaking
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      // Start speaking
       const utterance = new SpeechSynthesisUtterance(generatedContent);
-      utterance.lang = 'ar-SA'; // Set language to Arabic
-      utterance.rate = 0.9;     // Slightly slower for better clarity
+      utterance.lang = 'ar-SA';
+      utterance.rate = 0.9; 
       
       utterance.onend = () => {
         setIsSpeaking(false);
@@ -97,9 +101,7 @@ const ContentWorkspace = () => {
     }
   };
 
-  // --- NEW: Simulate Generation (For testing) ---
   const handleGenerate = () => {
-    // In a real app, this would be an API call
     const fakeResult = "هذا نص تجريبي تم توليده بواسطة الذكاء الاصطناعي. يهدف هذا النظام إلى مساعدة الكتاب وصناع المحتوى على تحسين إنتاجيتهم وتوليد أفكار إبداعية جديدة بسرعة وكفاءة عالية. يمكنك الآن الاستماع إلى هذا النص بالنقر على أيقونة الصوت في الأعلى.";
     setGeneratedContent(fakeResult);
   };
@@ -155,7 +157,6 @@ const ContentWorkspace = () => {
 
       <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30" dir="rtl">
         
-        {/* Header */}
         <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -173,13 +174,9 @@ const ContentWorkspace = () => {
           </div>
         </header>
 
-        {/* Main Grid */}
         <main className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-4rem)]">
           
-          {/* LEFT COLUMN */}
           <div className="lg:col-span-5 flex flex-col gap-4 h-full">
-            
-            {/* Tabs */}
             <div className="bg-slate-900/50 p-1.5 rounded-xl border border-slate-800 flex justify-between relative">
               {Object.values(modes).map((mode) => (
                 <button
@@ -197,9 +194,7 @@ const ContentWorkspace = () => {
               ))}
             </div>
 
-            {/* Input Panel */}
             <div className={`flex-1 rounded-2xl border border-slate-800 bg-slate-900/80 p-5 flex flex-col gap-4 relative overflow-hidden transition-colors duration-500 hover:border-slate-700 shadow-2xl shadow-black/20 group`}>
-              
               <div className={`absolute top-0 right-0 w-64 h-64 ${currentConfig.bgColor} blur-[80px] rounded-full opacity-40 pointer-events-none transition-colors duration-500`}></div>
 
               <div className="flex justify-between items-center z-10">
@@ -209,14 +204,8 @@ const ContentWorkspace = () => {
                   {activeMode === 'summarize' && 'المحتوى المراد تلخيصه'}
                   {activeMode === 'research' && 'موضوع البحث'}
                 </h2>
-                {activeMode === 'summarize' && (
-                   <button className="text-xs font-semibold flex items-center gap-1 text-slate-400 hover:text-amber-400 transition-colors">
-                      <UploadCloud size={14} /> رفع ملف
-                   </button>
-                )}
               </div>
 
-              {/* Input Textarea Wrapper */}
               <div className="relative flex-1 flex flex-col z-10">
                 <textarea 
                   className="flex-1 bg-transparent border-none resize-none focus:ring-0 text-lg placeholder-slate-600 leading-relaxed font-medium"
@@ -225,7 +214,6 @@ const ContentWorkspace = () => {
                   onChange={(e) => setInputText(e.target.value)}
                 ></textarea>
 
-                {/* Microphone Button */}
                 <button 
                   onClick={toggleMic}
                   className={`absolute bottom-0 left-0 p-2 rounded-full transition-all duration-300
@@ -234,13 +222,11 @@ const ContentWorkspace = () => {
                       : 'bg-slate-800 text-slate-500 hover:bg-slate-700 hover:text-white border border-slate-700'
                     }
                   `}
-                  title="تحدث للكتابة"
                 >
                   {isListening ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
               </div>
 
-              {/* Controls */}
               <div className="pt-4 border-t border-slate-800/50 z-10 grid grid-cols-2 gap-3">
                   {activeMode === 'create' && (
                     <>
@@ -253,7 +239,7 @@ const ContentWorkspace = () => {
                        <SelectBox label="نوع الملخص" options={['نقاط رئيسية', 'فقرة واحدة', 'تحليل شامل']} />
                        <div className="flex items-center gap-2 text-slate-400 text-sm bg-slate-800/50 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-800 transition-colors font-medium">
                           <UploadCloud size={16} />
-                          <span>اسحب ملف PDF</span>
+                          <span>رفع ملف PDF</span>
                        </div>
                     </>
                   )}
@@ -268,7 +254,6 @@ const ContentWorkspace = () => {
                   )}
               </div>
 
-              {/* Action Button */}
               <button 
                 onClick={handleGenerate}
                 className={`w-full py-4 rounded-xl font-bold text-white shadow-lg shadow-black/30 flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.98] ${currentConfig.btnColor}`}
@@ -279,20 +264,32 @@ const ContentWorkspace = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
           <div className="lg:col-span-7 h-full flex flex-col gap-4">
             <div className="flex-1 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col overflow-hidden relative shadow-2xl">
               
-              {/* Toolbar */}
               <div className="h-14 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between px-4">
-                 <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1">
                     <span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></span>
                     <span className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></span>
                     <span className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                    
-                    {/* --- NEW: Text-to-Speech Button --- */}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {/* --- NEW: Publish Button --- */}
+                    <button 
+                      onClick={handlePublish}
+                      disabled={!generatedContent}
+                      className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 
+                        ${generatedContent 
+                          ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95' 
+                          : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-50'}`}
+                    >
+                      <Send size={16} />
+                      <span>نشر المقال</span>
+                    </button>
+
+                    <div className="h-4 w-[1px] bg-slate-700 mx-1"></div>
+
                     <button 
                       onClick={handleSpeak}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all duration-300 text-sm font-medium border
@@ -300,24 +297,20 @@ const ContentWorkspace = () => {
                           ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50 animate-pulse' 
                           : 'bg-transparent text-slate-400 hover:text-white hover:bg-slate-800 border-transparent'
                         }`}
-                      title={isSpeaking ? "إيقاف القراءة" : "قراءة النص"}
                     >
                       {isSpeaking ? <Square size={16} fill="currentColor" /> : <Volume2 size={16} />}
                       <span>{isSpeaking ? 'إيقاف' : 'استماع'}</span>
                     </button>
-                    {/* ---------------------------------- */}
                     
                     <div className="h-4 w-[1px] bg-slate-700 mx-1"></div>
                     <ToolButton icon={<Copy size={16} />} label="نسخ" />
                     <ToolButton icon={<Save size={16} />} label="حفظ" />
                     <div className="h-4 w-[1px] bg-slate-700 mx-1"></div>
                     <ToolButton icon={<Maximize2 size={16} />} />
-                 </div>
+                  </div>
               </div>
 
-              {/* Editor Area (Result) */}
               <div className="flex-1 p-8 overflow-y-auto leading-8 text-lg text-slate-300 relative bg-slate-900">
-                {/* Empty State */}
                 {!generatedContent && !inputText && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 opacity-50 select-none">
                     <div className={`w-24 h-24 rounded-full ${currentConfig.bgColor} flex items-center justify-center mb-6 transition-colors duration-500`}>
@@ -326,11 +319,9 @@ const ContentWorkspace = () => {
                       {activeMode === 'research' && <Globe size={40} className={currentConfig.color} />}
                     </div>
                     <p className="text-xl font-bold">النتيجة ستظهر هنا...</p>
-                    <p className="text-sm mt-2 font-medium">املأ البيانات واضغط على الزر أدناه</p>
                   </div>
                 )}
                 
-                {/* Loading State (Simulated with inputText for demo) */}
                 {inputText && !generatedContent && (
                   <div className="animate-pulse space-y-4 opacity-50 pt-10">
                       <div className="h-4 bg-slate-800 rounded w-3/4"></div>
@@ -339,7 +330,6 @@ const ContentWorkspace = () => {
                   </div>
                 )}
 
-                {/* --- Display Generated Content --- */}
                 {generatedContent && (
                   <div className="prose prose-invert prose-lg max-w-none">
                     <p>{generatedContent}</p>
@@ -347,7 +337,6 @@ const ContentWorkspace = () => {
                 )}
               </div>
 
-              {/* Status Bar */}
               <div className="h-9 bg-slate-950 border-t border-slate-800 flex items-center justify-between px-4 text-xs font-medium text-slate-500">
                  <div className="flex gap-4">
                     <span>الكلمات: {generatedContent ? generatedContent.split(' ').length : 0}</span>
@@ -360,14 +349,12 @@ const ContentWorkspace = () => {
               </div>
             </div>
           </div>
-
         </main>
       </div>
     </>
   );
 };
 
-// Sub-components
 const ToolButton = ({ icon, label }) => (
   <button className="flex items-center gap-2 px-3 py-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm font-medium">
     {icon}
