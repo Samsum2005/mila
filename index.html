@@ -1,16 +1,94 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <title>Journalist AI</title>
-  </head>
-  <body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Sanad AI</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const SettingsPage = () => {
+            const [myArticles] = useState([
+                { id: 1, title: "مستقبل الذكاء الاصطناعي في الصحافة", date: "2025/05/10", type: "نشر" },
+                { id: 2, title: "تحليل سوق الطاقة في الجزائر", date: "2025/05/08", type: "حفظ" }
+            ]);
+
+            return (
+                <div className="min-h-screen pb-12">
+                    <header className="border-b border-slate-800 bg-slate-900/50 p-6 sticky top-0">
+                        <h1 className="text-xl font-bold">الإعدادات</h1>
+                    </header>
+
+                    <main className="max-w-4xl mx-auto px-6 pt-8 space-y-8">
+                        {/* Profile Section */}
+                        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                <i data-lucide="user" className="text-blue-500"></i> الملف الشخصي
+                            </h2>
+                            <div className="flex gap-6 items-center">
+                                <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                                    <i data-lucide="user" size="40" className="text-slate-500"></i>
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-xs text-slate-400 font-bold block mb-1">الاسم الكامل</label>
+                                    <div className="bg-slate-950 border border-slate-700 rounded-lg p-2">أنيس الجزائري</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* My Data Section (بياناتي) */}
+                        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                <i data-lucide="database" className="text-indigo-400"></i> بياناتي ومسوداتي
+                            </h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-right">
+                                    <thead>
+                                        <tr className="text-slate-500 text-xs border-b border-slate-800">
+                                            <th className="pb-3">عنوان المقال</th>
+                                            <th className="pb-3">التاريخ</th>
+                                            <th className="pb-3 text-center">الحالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800">
+                                        {myArticles.map(art => (
+                                            <tr key={art.id}>
+                                                <td className="py-4 text-sm">{art.title}</td>
+                                                <td className="py-4 text-sm text-slate-400">{art.date}</td>
+                                                <td className="py-4 text-center">
+                                                    <span className={`text-[10px] px-2 py-1 rounded font-bold ${art.type === 'نشر' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                                                        {art.type}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SettingsPage />);
+        
+        // Initialize icons after React renders
+        setTimeout(() => lucide.createIcons(), 500);
+    </script>
+</body>
 </html>
